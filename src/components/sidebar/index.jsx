@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import './Sidebar.css';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { useWallet } from '@solana/wallet-adapter-react';
-import * as nsfwjs from 'nsfwjs'; // Import NSFW detection library
-import * as tf from '@tensorflow/tfjs'; // Import TensorFlow.js
+import React, { useEffect, useState } from "react";
+import "./Sidebar.css";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { useWallet } from "@solana/wallet-adapter-react";
+import * as nsfwjs from "nsfwjs"; // Import NSFW detection library
+import * as tf from "@tensorflow/tfjs"; // Import TensorFlow.js
+import solanaLogo from "../../assets/solana.png";
 
 function Sidebar({
   sidebarVisible,
@@ -18,6 +19,7 @@ function Sidebar({
   fileInputRef,
   handlePostAd,
   loading,
+  totalSolana,
 }) {
   const [connection, setConnection] = useState(false);
   const { connected } = useWallet();
@@ -45,10 +47,10 @@ function Sidebar({
 
           // Extract probabilities for Hentai and Porn
           const pornConfidence =
-            predictions.find((pred) => pred.className === 'Porn')
+            predictions.find((pred) => pred.className === "Porn")
               ?.probability || 0;
           const hentaiConfidence =
-            predictions.find((pred) => pred.className === 'Hentai')
+            predictions.find((pred) => pred.className === "Hentai")
               ?.probability || 0;
 
           // Convert to percentage
@@ -62,7 +64,7 @@ function Sidebar({
           // Reject only if Hentai or Porn is above 80%
           if (pornPercentage > 90 || hentaiPercentage > 90) {
             alert(
-              '⚠️ NSFW content detected (Hentai or Porn > 70%)! The image cannot be uploaded.'
+              "⚠️ NSFW content detected (Hentai or Porn > 70%)! The image cannot be uploaded."
             );
           } else {
             // Acceptable content
@@ -70,9 +72,9 @@ function Sidebar({
             setFormData({ ...formData, image: file }); // Allow safe images
           }
         } catch (error) {
-          console.error('NSFW Detection Error:', error);
+          console.error("NSFW Detection Error:", error);
           alert(
-            '❌ An error occurred during NSFW detection. Please try again.'
+            "❌ An error occurred during NSFW detection. Please try again."
           );
         }
         setNsfwLoading(false); // Hide loading state
@@ -82,7 +84,7 @@ function Sidebar({
   };
 
   return (
-    <div className="sidebar" style={{ right: sidebarVisible ? '0' : '-320px' }}>
+    <div className="sidebar" style={{ right: sidebarVisible ? "0" : "-320px" }}>
       <div className="sidebar-title">
         <h3>
           Purchase <span>{selectedPixels.size}</span> Blocks
@@ -95,28 +97,32 @@ function Sidebar({
       <div className="total-pixels-container">
         <p className="total-blocks-pixels">
           <span>{selectedPixels.size}</span> Block (
-          <span>{selectedPixels.size * 100}</span> Pixels) ={' '}
+          <span>{selectedPixels.size * 100}</span> Pixels) ={" "}
           {selectedPixels.size * 100}$
         </p>
         <p className="block-price">Rate: 1 Pixel = 1$</p>
+        <p className="solana-price">
+          Price in Solana = {totalSolana}{" "}
+          <img src={solanaLogo} alt="logo" width="12px" />
+        </p>
       </div>
 
       <div>
         <button
-          className={`${activeTab === 'image' ? 'active' : 'tabs'} image`}
-          onClick={() => setActiveTab('image')}
+          className={`${activeTab === "image" ? "active" : "tabs"} image`}
+          onClick={() => setActiveTab("image")}
         >
           Image
         </button>
         <button
-          className={`${activeTab === 'text' ? 'active' : 'tabs'} text`}
-          onClick={() => setActiveTab('text')}
+          className={`${activeTab === "text" ? "active" : "tabs"} text`}
+          onClick={() => setActiveTab("text")}
         >
           Text
         </button>
       </div>
 
-      {activeTab === 'image' ? (
+      {activeTab === "image" ? (
         <div className="image-advertisement-container">
           <div className="upload-advertisment">
             <label className="upload-image">
@@ -127,16 +133,16 @@ function Sidebar({
                     alt="Preview"
                     className="image-preview"
                     style={{
-                      maxWidth: '100%',
-                      maxHeight: '200px',
-                      borderRadius: '8px',
-                      marginBottom: '10px',
+                      maxWidth: "100%",
+                      maxHeight: "200px",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
                     }}
                   />
                 </div>
               ) : (
-                <div style={{ padding: '40px 20px' }}>
-                  <p>{nsfwLoading ? 'Scanning image...' : 'Upload Image'}</p>
+                <div style={{ padding: "40px 20px" }}>
+                  <p>{nsfwLoading ? "Scanning image..." : "Upload Image"}</p>
                   <p>(PNG, JPG, GIF)</p>
                 </div>
               )}
@@ -144,7 +150,7 @@ function Sidebar({
                 type="file"
                 ref={fileInputRef}
                 accept="image/*"
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
                 onChange={(e) => checkNSFW(e.target.files[0])}
               />
             </label>
@@ -214,7 +220,7 @@ function Sidebar({
         <WalletMultiButton className="place-advertisement-button" />
         {connection && (
           <button onClick={handlePostAd} className="place-advertisement-button">
-            {loading ? 'Placing...' : 'Place Advertisement'}
+            {loading ? "Placing..." : "Place Advertisement"}
           </button>
         )}
       </div>
