@@ -1,0 +1,39 @@
+.contract-address-subContainer {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.contract-address {
+
+  color: #fff;
+  font-size: 10pt;
+  
+
+
+}
+.copy-btn {
+
+  font-size: 7pt;
+  padding: 2px 3px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: none;
+  /* color: #fff; */
+
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+    margin-left: -10px;
+}
+
+.contract-address-CA {
+  /* font-weight: 600; */
+  color: #fff;
+  font-size: 10pt;
+}
+
+.link{
+  text-decoration: none;
+  
+}

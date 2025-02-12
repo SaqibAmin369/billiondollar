@@ -1,0 +1,21 @@
+.terms-condition-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 10px;
+}
+.section-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.section-subsection {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-left: 15px;
+}
+/* //added */
+.lists-item {
+  padding-left: 40px;
+}

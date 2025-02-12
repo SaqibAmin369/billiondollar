@@ -1,0 +1,12 @@
+footer {
+  background-color: #646464;
+  padding: 10pt;
+  p {
+    color: #fff;
+    font-size: 12px;
+    text-align: center;
+  }
+  a {
+    text-decoration: none;
+  }
+}

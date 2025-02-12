@@ -1,0 +1,39 @@
+.buy-pixels-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+  color: #fff;
+}
+
+.instruction {
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.how-works {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.order-list {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+  font-size: 18px;
+  list-style-position: inside; /* Ensures bullet points move slightly left */
+}
+
+.order-list li {
+  margin-left: -5px; /* Moves list items slightly left */
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  gap: 10px;
+}
