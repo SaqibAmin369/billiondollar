@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import "./Grid.css";
 import Sidebar from "../sidebar";
 import { calculateFontSize } from "../../utils/fontSize";
@@ -13,7 +19,7 @@ import {
 } from "@solana/web3.js";
 import axios from "axios";
 import { log } from "@tensorflow/tfjs";
-const network = WalletAdapterNetwork.Devnet;
+const network = WalletAdapterNetwork.Mainnet;
 
 const TOTAL_PIXELS = 1000000000;
 const PIXELS_PER_BLOCK = 1000000;
@@ -194,15 +200,18 @@ function Grid({ updatePixels }) {
 
       // Replace with your recipient address
       const recipientAddress = "5pZvGUtt2euBs8tTtgfnnHWkkoaDSEkVqCErzzTR5Exj";
-      const connection = new Connection(clusterApiUrl(network));
-      const price = selectedPixels.size * 0.004;
-      console.log(price, "price");
+      const connection = new Connection(
+        "https://mainnet.helius-rpc.com/?api-key=1a9accbb-5b32-46dc-8ac8-c75d9b721433"
+      );
+      const price = selectedPixels.size * 100;
+      const solanaPriceTransaction = (price / solPrice).toFixed(4);
+      console.log(solanaPriceTransaction, "price");
       // Create transaction
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: new PublicKey(recipientAddress),
-          lamports: Math.round(1000000000 * price), // 1 SOL
+          lamports: Math.round(1000000000 * solanaPriceTransaction), // 1 SOL
         })
       );
 
