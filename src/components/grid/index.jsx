@@ -4,21 +4,20 @@ import React, {
   useRef,
   useCallback,
   useMemo,
-} from "react";
-import "./Grid.css";
-import Sidebar from "../sidebar";
-import { calculateFontSize } from "../../utils/fontSize";
-import { WalletProvider, useWallet } from "@solana/wallet-adapter-react";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+} from 'react';
+import './Grid.css';
+import Sidebar from '../sidebar';
+import { calculateFontSize } from '../../utils/fontSize';
+import { WalletProvider, useWallet } from '@solana/wallet-adapter-react';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import {
-  clusterApiUrl,
   Connection,
+  PublicKey,
   Transaction,
   SystemProgram,
-  PublicKey,
-} from "@solana/web3.js";
-import axios from "axios";
-import { log } from "@tensorflow/tfjs";
+} from '@solana/web3.js';
+import axios from 'axios';
+import { log } from '@tensorflow/tfjs';
 const network = WalletAdapterNetwork.Mainnet;
 
 const TOTAL_PIXELS = 1000000000;
@@ -32,20 +31,20 @@ function Grid({ updatePixels }) {
   const [endCoord, setEndCoord] = useState(null);
   const [selectedPixels, setSelectedPixels] = useState(new Set());
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  const [activeTab, setActiveTab] = useState("image");
+  const [activeTab, setActiveTab] = useState('image');
   const [loading, setLoading] = useState(false); // Track loading state
   const [currentPixels, setCurrentPixels] = useState(PIXELS_PER_BLOCK);
   const [formData, setFormData] = useState({
     image: null,
-    adUrl: "",
-    adDescription: "",
+    adUrl: '',
+    adDescription: '',
   });
-  const imageBaseUrl = "https://api.billiondollarhomepage.io/public/blocks/";
+  const imageBaseUrl = 'https://api.billiondollarhomepage.io/public/blocks/';
   const [textDate, setTextDate] = useState({
-    customText: "",
-    textUrl: "",
-    backgroundColor: "#FFFFFF",
-    textColor: "#000000",
+    customText: '',
+    textUrl: '',
+    backgroundColor: '#FFFFFF',
+    textColor: '#000000',
   });
   const [placedAds, setPlacedAds] = useState([]);
   const [selectionDimensions, setSelectionDimensions] = useState({
@@ -66,16 +65,16 @@ function Grid({ updatePixels }) {
   const handlePostAd = async () => {
     try {
       if (!startCoord || !endCoord) {
-        alert("Please select an area on the grid before posting an ad.");
+        alert('Please select an area on the grid before posting an ad.');
         return false;
       }
-      if (activeTab === "image") {
+      if (activeTab === 'image') {
         if (!formData.image) {
-          alert("Please upload an image before placing the advertisement.");
+          alert('Please upload an image before placing the advertisement.');
           return false;
         }
         if (!formData.adUrl) {
-          alert("Please Add Website Url placing the advertisement.");
+          alert('Please Add Website Url placing the advertisement.');
           return false;
         }
       }
@@ -85,38 +84,38 @@ function Grid({ updatePixels }) {
       const payment = await sendSol();
       if (!payment) {
         setLoading(true);
-        alert("Failed to post ad. Please try again.");
+        alert('Failed to post ad. Please try again.');
 
         return false;
       }
 
       const fd = new FormData();
-      fd.append("walletAddress", publicKey?.toBase58() || ""); // Use publicKey from the wallet
-      fd.append("startCoord", `(${startCoord.x},${startCoord.y})`);
-      fd.append("endCoord", `(${endCoord.x},${endCoord.y})`);
+      fd.append('walletAddress', publicKey?.toBase58() || ''); // Use publicKey from the wallet
+      fd.append('startCoord', `(${startCoord.x},${startCoord.y})`);
+      fd.append('endCoord', `(${endCoord.x},${endCoord.y})`);
 
-      if (activeTab === "image" && formData.image) {
-        fd.append("file", formData.image);
-        fd.append("addUrl", formData.adUrl);
-        fd.append("addDescription", formData.adDescription);
+      if (activeTab === 'image' && formData.image) {
+        fd.append('file', formData.image);
+        fd.append('addUrl', formData.adUrl);
+        fd.append('addDescription', formData.adDescription);
       }
 
-      if (activeTab === "text") {
-        fd.append("customText", textDate.customText);
-        fd.append("textUrl", textDate.textUrl);
-        fd.append("backgroundColor", textDate.backgroundColor);
-        fd.append("textColor", textDate.textColor);
+      if (activeTab === 'text') {
+        fd.append('customText', textDate.customText);
+        fd.append('textUrl', textDate.textUrl);
+        fd.append('backgroundColor', textDate.backgroundColor);
+        fd.append('textColor', textDate.textColor);
       }
 
-      axios.defaults.baseURL = "https://api.billiondollarhomepage.io/";
+      axios.defaults.baseURL = 'https://api.billiondollarhomepage.io/';
 
       // Send POST request
-      const response = await axios.post("/api/blocks/add", fd, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const response = await axios.post('/api/blocks/add', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      console.log("Ad posted successfully:", response.data);
-      alert("Ad posted successfully!");
+      console.log('Ad posted successfully:', response.data);
+      alert('Ad posted successfully!');
 
       // Refetch grid data
       fetchAds();
@@ -125,17 +124,17 @@ function Grid({ updatePixels }) {
       calculatePixels();
 
       // Clear the form and selection
-      setFormData({ image: null, adUrl: "", adDescription: "" });
+      setFormData({ image: null, adUrl: '', adDescription: '' });
       setTextDate({
-        customText: "",
-        textUrl: "",
-        backgroundColor: "#FFFFFF",
-        textColor: "#000000",
+        customText: '',
+        textUrl: '',
+        backgroundColor: '#FFFFFF',
+        textColor: '#000000',
       });
       clearSelection();
     } catch (error) {
-      console.error("Error posting ad:", error);
-      alert("Failed to post ad. Please try again.");
+      console.error('Error posting ad:', error);
+      alert('Failed to post ad. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -143,8 +142,8 @@ function Grid({ updatePixels }) {
 
   const fetchAds = useCallback(async () => {
     try {
-      axios.defaults.baseURL = "https://api.billiondollarhomepage.io/";
-      const response = await axios.get("/api/blocks");
+      axios.defaults.baseURL = 'https://api.billiondollarhomepage.io/';
+      const response = await axios.get('/api/blocks');
       const ads = response.data;
 
       const formattedAds = ads.map((ad) => {
@@ -157,7 +156,7 @@ function Grid({ updatePixels }) {
         const [endX, endY] = extractCoords(ad.endCoord);
 
         return {
-          type: ad.image ? "image" : "text",
+          type: ad.image ? 'image' : 'text',
           coordinates: {
             minX: startX * 10,
             minY: startY * 10,
@@ -173,57 +172,74 @@ function Grid({ updatePixels }) {
             : {
                 customText: ad.customText,
                 textUrl: ad.textUrl,
-                backgroundColor: ad.backgroundColor || "#000",
-                textColor: ad.textColor || "#fff",
+                backgroundColor: ad.backgroundColor || '#000',
+                textColor: ad.textColor || '#fff',
               }),
         };
       });
 
       setPlacedAds(formattedAds);
     } catch (error) {
-      console.error("Error fetching ads:", error);
+      console.error('Error fetching ads:', error);
     }
   }, []);
 
   useEffect(() => {
     fetchAds();
   }, [fetchAds]);
-
   const sendSol = useCallback(async () => {
     try {
       if (!publicKey) {
-        console.log("Wallet not connected!");
+        console.log('Wallet not connected!');
         return false;
       }
 
-      console.log("Creating transaction...");
+      console.log('Creating transaction...');
 
       // Replace with your recipient address
-      const recipientAddress = "5pZvGUtt2euBs8tTtgfnnHWkkoaDSEkVqCErzzTR5Exj";
-      const connection = new Connection(
-        "https://mainnet.helius-rpc.com/?api-key=1a9accbb-5b32-46dc-8ac8-c75d9b721433"
+      const recipientAddress = new PublicKey(
+        '5pZvGUtt2euBs8tTtgfnnHWkkoaDSEkVqCErzzTR5Exj'
       );
-      const price = selectedPixels.size * 100;
-      const solanaPriceTransaction = (price / solPrice).toFixed(4);
-      console.log(solanaPriceTransaction, "price");
-      // Create transaction
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey,
-          toPubkey: new PublicKey(recipientAddress),
-          lamports: Math.round(1000000000 * solanaPriceTransaction), // 1 SOL
-        })
+      const connection = new Connection(
+        'https://mainnet.helius-rpc.com/?api-key=1a9accbb-5b32-46dc-8ac8-c75d9b721433'
       );
 
-      console.log("Getting recent blockhash...");
+      const price = selectedPixels.size * 100;
+      const solanaPriceTransaction = (price / solPrice).toFixed(4);
+      console.log(solanaPriceTransaction, 'price');
+
+      // Replace with your smart contract program ID
+      const programId = new PublicKey(
+        'GDUYvFQJJ4UievNjB3uHA5m317UB2yReoU2canC3o7e2'
+      );
+
+      // Create a transaction
+      const transaction = new Transaction();
+
+      // Add your smart contract instruction
+      transaction.add({
+        keys: [
+          { pubkey: publicKey, isSigner: true, isWritable: true }, // Sender
+          { pubkey: recipientAddress, isSigner: false, isWritable: true }, // Recipient
+          {
+            pubkey: SystemProgram.programId,
+            isSigner: false,
+            isWritable: false,
+          }, // System program
+        ],
+        programId: programId, // Your smart contract program ID
+        data: Buffer.from([]), // Replace with the correct instruction data
+      });
+
+      console.log('Getting recent blockhash...');
       const { blockhash } = await connection.getLatestBlockhash();
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = publicKey;
 
-      console.log("Signing transaction...");
+      console.log('Signing transaction...');
       const signedTransaction = await signTransaction(transaction);
 
-      console.log("Sending transaction...");
+      console.log('Sending transaction...');
       const signature = await connection.sendRawTransaction(
         signedTransaction.serialize()
       );
@@ -232,13 +248,13 @@ function Grid({ updatePixels }) {
 
       // Confirm transaction
       await connection.confirmTransaction(signature);
-      console.log("Transaction confirmed!");
+      console.log('Transaction confirmed!');
       return true;
     } catch (error) {
       console.error(error.message);
       return false;
     }
-  }, [publicKey, signTransaction, selectedPixels]);
+  }, [publicKey, signTransaction, selectedPixels, solPrice]);
   useEffect(() => {
     const grid = gridRef.current;
     if (!grid) return;
@@ -249,8 +265,8 @@ function Grid({ updatePixels }) {
 
     const fragment = document.createDocumentFragment();
     for (let i = existingPixels; i < currentPixels / 10; i++) {
-      const pixel = document.createElement("div");
-      pixel.className = "pixel";
+      const pixel = document.createElement('div');
+      pixel.className = 'pixel';
       pixel.dataset.x = i % 100;
       pixel.dataset.y = Math.floor(i / 100);
       fragment.appendChild(pixel);
@@ -275,8 +291,8 @@ function Grid({ updatePixels }) {
 
     if (clickedAd) {
       window.open(
-        clickedAd.type === "image" ? clickedAd.adUrl : clickedAd.textUrl,
-        "_blank"
+        clickedAd.type === 'image' ? clickedAd.adUrl : clickedAd.textUrl,
+        '_blank'
       );
       return;
     }
@@ -326,7 +342,7 @@ function Grid({ updatePixels }) {
       const grid = gridRef.current;
 
       // Remove any existing combined block
-      const existingBlock = document.querySelector(".combined-block");
+      const existingBlock = document.querySelector('.combined-block');
       if (existingBlock) {
         grid.removeChild(existingBlock);
       }
@@ -338,21 +354,21 @@ function Grid({ updatePixels }) {
       );
 
       // Create and append the new combined block
-      const block = document.createElement("div");
-      block.className = "combined-block"; // Assign a class for the combined block
-      block.style.position = "absolute";
+      const block = document.createElement('div');
+      block.className = 'combined-block'; // Assign a class for the combined block
+      block.style.position = 'absolute';
       block.style.left = `${combinedBlock.minX}px`;
       block.style.top = `${combinedBlock.minY}px`;
       block.style.width = `${combinedBlock.width}px`;
       block.style.height = `${combinedBlock.height}px`;
-      block.style.backgroundColor = "gray";
-      block.style.display = "flex";
-      block.style.alignItems = "center";
-      block.style.justifyContent = "center";
-      block.style.color = "white";
+      block.style.backgroundColor = 'gray';
+      block.style.display = 'flex';
+      block.style.alignItems = 'center';
+      block.style.justifyContent = 'center';
+      block.style.color = 'white';
       block.style.fontSize = `${fontSize}px`;
-      block.style.textAlign = "center";
-      block.style.padding = "2px";
+      block.style.textAlign = 'center';
+      block.style.padding = '2px';
       block.innerHTML = `${selectionDimensions.width * 10} X ${
         selectionDimensions.height * 10
       }\n Your Logo Here`;
@@ -387,7 +403,7 @@ function Grid({ updatePixels }) {
       );
       if (isOverlap) {
         alert(
-          "Selection overlaps with an already placed ad. Try another area."
+          'Selection overlaps with an already placed ad. Try another area.'
         );
         clearSelection();
         return;
@@ -405,21 +421,21 @@ function Grid({ updatePixels }) {
     // Clear previous selection
     selectedPixels.forEach((coord) => {
       const pixel = document.querySelector(
-        `.pixel[data-x="${coord.split(",")[0]}"][data-y="${
-          coord.split(",")[1]
+        `.pixel[data-x="${coord.split(',')[0]}"][data-y="${
+          coord.split(',')[1]
         }"]`
       );
-      if (pixel) pixel.classList.remove("selected");
+      if (pixel) pixel.classList.remove('selected');
     });
 
     // Apply new selection
     newSelection.forEach((coord) => {
       const pixel = document.querySelector(
-        `.pixel[data-x="${coord.split(",")[0]}"][data-y="${
-          coord.split(",")[1]
+        `.pixel[data-x="${coord.split(',')[0]}"][data-y="${
+          coord.split(',')[1]
         }"]`
       );
-      if (pixel) pixel.classList.add("selected");
+      if (pixel) pixel.classList.add('selected');
     });
 
     setSelectedPixels(newSelection);
@@ -432,11 +448,11 @@ function Grid({ updatePixels }) {
   const clearSelection = () => {
     selectedPixels.forEach((coord) => {
       const pixel = document.querySelector(
-        `.pixel[data-x="${coord.split(",")[0]}"][data-y="${
-          coord.split(",")[1]
+        `.pixel[data-x="${coord.split(',')[0]}"][data-y="${
+          coord.split(',')[1]
         }"]`
       );
-      if (pixel) pixel.classList.remove("selected");
+      if (pixel) pixel.classList.remove('selected');
     });
 
     setSelectedPixels(new Set());
@@ -446,26 +462,26 @@ function Grid({ updatePixels }) {
   };
 
   const placeAd = async () => {
-    if (activeTab === "image") {
+    if (activeTab === 'image') {
       if (!formData.image || !formData.adUrl || !formData.adDescription) {
-        alert("Please fill all fields and select an image");
+        alert('Please fill all fields and select an image');
         return;
       }
     }
-    if (activeTab === "text") {
+    if (activeTab === 'text') {
       if (!textDate.customText || !textDate.textUrl) {
-        alert("Please fill all fields and Custom text");
+        alert('Please fill all fields and Custom text');
         return;
       }
     }
 
     if (selectedPixels.size === 0) {
-      alert("Please select an area for the advertisement");
+      alert('Please select an area for the advertisement');
       return;
     }
     const payment = await sendSol();
     const coordinates = Array.from(selectedPixels).map((coord) =>
-      coord.split(",").map(Number)
+      coord.split(',').map(Number)
     );
     const minX = Math.min(...coordinates.map(([x]) => x)) * 10;
     const minY = Math.min(...coordinates.map(([, y]) => y)) * 10;
@@ -476,7 +492,7 @@ function Grid({ updatePixels }) {
 
     const ad = {
       type: activeTab,
-      ...(activeTab === "image"
+      ...(activeTab === 'image'
         ? {
             image: formData.image,
             adUrl: formData.adUrl,
@@ -494,12 +510,12 @@ function Grid({ updatePixels }) {
     setPlacedAds([...placedAds, ad]);
 
     // Clear the form
-    setFormData({ image: null, adUrl: "", adDescription: "" });
+    setFormData({ image: null, adUrl: '', adDescription: '' });
     setTextDate({
-      customText: "",
-      textUrl: "",
-      backgroundColor: "#FFFFFF",
-      textColor: "#000000",
+      customText: '',
+      textUrl: '',
+      backgroundColor: '#FFFFFF',
+      textColor: '#000000',
     });
 
     // Reset the file input field
@@ -509,7 +525,7 @@ function Grid({ updatePixels }) {
 
     clearSelection();
     const grid = gridRef.current;
-    const existingBlock = document.querySelector(".combined-block");
+    const existingBlock = document.querySelector('.combined-block');
     if (existingBlock) {
       grid.removeChild(existingBlock);
     }
@@ -541,11 +557,11 @@ function Grid({ updatePixels }) {
     const fetchSolPrice = async () => {
       try {
         const response = await axios.get(
-          "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd"
+          'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd'
         );
         setSolPrice(response.data.solana.usd);
       } catch (error) {
-        console.error("Error fetching SOL price:", error);
+        console.error('Error fetching SOL price:', error);
       }
     };
 
@@ -556,7 +572,7 @@ function Grid({ updatePixels }) {
   // total usd in Solona
   const totalSolana = solPrice
     ? (totalUsd / solPrice).toFixed(4)
-    : "Loading...";
+    : 'Loading...';
 
   return (
     <div className="main-container">
@@ -572,38 +588,38 @@ function Grid({ updatePixels }) {
               <div
                 key={index}
                 style={{
-                  position: "absolute",
+                  position: 'absolute',
                   left: ad.coordinates.minX,
                   top: ad.coordinates.minY,
                   width: ad.coordinates.width,
                   height: ad.coordinates.height,
-                  ...(ad.type === "image"
+                  ...(ad.type === 'image'
                     ? {
                         backgroundImage: `url(${ad.image})`,
-                        backgroundSize: "cover",
-                        backgroundRepeat: "no-repeat",
+                        backgroundSize: 'cover',
+                        backgroundRepeat: 'no-repeat',
                       }
                     : {
                         backgroundColor: ad.backgroundColor,
                         color: ad.textColor,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "12px",
-                        textAlign: "center",
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px',
+                        textAlign: 'center',
                       }),
-                  cursor: "pointer",
+                  cursor: 'pointer',
                 }}
-                title={ad.type === "image" ? ad.adDescription : ad.customText}
+                title={ad.type === 'image' ? ad.adDescription : ad.customText}
                 onClick={(e) => {
                   e.stopPropagation();
                   window.open(
-                    ad.type === "image" ? ad.adUrl : ad.textUrl,
-                    "_blank"
+                    ad.type === 'image' ? ad.adUrl : ad.textUrl,
+                    '_blank'
                   );
                 }}
               >
-                {ad.type === "text" && ad.customText}
+                {ad.type === 'text' && ad.customText}
               </div>
             ))}
           </div>
