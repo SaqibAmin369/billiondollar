@@ -208,15 +208,12 @@ function Grid({ updatePixels }) {
       const solanaPriceTransaction = (price / solPrice).toFixed(4);
       console.log(solanaPriceTransaction, 'price');
 
-      // Replace with your smart contract program ID
       const programId = new PublicKey(
         'GDUYvFQJJ4UievNjB3uHA5m317UB2yReoU2canC3o7e2'
       );
 
-      // Create a transaction
       const transaction = new Transaction();
 
-      // Add your smart contract instruction
       transaction.add({
         keys: [
           { pubkey: publicKey, isSigner: true, isWritable: true }, // Sender
